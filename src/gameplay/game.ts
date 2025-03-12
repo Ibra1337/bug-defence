@@ -1,8 +1,8 @@
-import { Movable } from "../geometry/Movable";
+import { Movable } from "../geometry/movable.ts";
 import { Renderer } from "../GUI/Renderer";
 import GameLogic from "./gameLogic";
 import IGameMediator from "./igameMediator";
-import { Tester } from "../geometry/Tester";
+
 export default class Game implements IGameMediator{
 
     private renderer :Renderer

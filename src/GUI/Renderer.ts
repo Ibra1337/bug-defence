@@ -1,6 +1,6 @@
 
-import { Tester } from "../geometry/Tester";
-import { xDirection , yDirection, Movable } from "../geometry/Movable";
+import { PathFollower } from "../geometry/pathFollower";
+import { xDirection , yDirection, Movable } from "../geometry/movable.ts";
 import IGameMediator from "../gameplay/igameMediator";
 
 export class Renderer {
