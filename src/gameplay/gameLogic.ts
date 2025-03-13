@@ -1,6 +1,7 @@
-import { Movable, xDirection, yDirection } from "../geometry/Movable";
+import { Movable, xDirection, yDirection } from "../geometry/movable.ts";
 import IGameMediator from "./igameMediator";
-import { Tester } from "../geometry/Tester";
+import { PathFollower } from "../geometry/pathFollower";
+import StraightProjectile from "../geometry/strightProjectile.ts";
 
 export default class GameLogic {
 
@@ -11,12 +12,11 @@ export default class GameLogic {
         console.log(this.board)
     }
 
-    //veorra
-    // need a way to enter curr x,y
-    //get currnent box 
-    private generateTester(): Tester {
-        let t = new Tester(100, 100, 100, 100, 1, this.path);
+    private generateTester(): PathFollower {
+        let t = new PathFollower(100, 100, 100, 100, 1, this.path);
         this.movingObjects.set(t.id, t);
+        let p = new StraightProjectile(10,10,40,40,10,{x:800,y:800})
+        this.movingObjects.set(p.id , p);
         return t;
     }
 
