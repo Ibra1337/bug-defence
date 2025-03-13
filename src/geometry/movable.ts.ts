@@ -1,15 +1,12 @@
+import Sprite from "../GUI/sprite";
+
 const enum xDirection {LEFT = -1 ,STAY =0 ,  RIGHT = 1}
 const enum yDirection {UP = -1 ,STAY=0 , DOWN =1}
 
-export abstract class Movable{
+export abstract class Movable extends Sprite{
 
-
-    private static lastId =0;
-
-    public readonly id :number;
-    constructor( public x:number , public y :number , public width:number , public height: number , public speed :number ){
-        this.id = Movable.lastId ;
-        Movable.lastId++;
+    constructor(  x:number ,  y :number ,  width:number ,  height: number , image:string , public speed :number ){
+        super(x,y,width,height,image )
     }
 
     public xGetCenter() :number{

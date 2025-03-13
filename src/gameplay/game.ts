@@ -1,13 +1,14 @@
 import { Movable } from "../geometry/movable.ts";
 import { Renderer } from "../GUI/Renderer";
-import GameLogic from "./gameLogic";
-import IGameMediator from "./igameMediator";
+import GameLogic from "./gameLogic.ts";
+import GameState from "./gameState.ts";
+import IGameMediator from "./igameMediator.ts";
 
 export default class Game implements IGameMediator{
 
     private renderer :Renderer
     private gameLogic :GameLogic
-    private movingObjects :Map<number , Movable>
+    private gameState :GameState
     private board :number[][];
     
     constructor(){
@@ -18,9 +19,9 @@ export default class Game implements IGameMediator{
         for (let i=0 ; i<10; i++ ){
             this.board[9][i] = 1;
         }
-        this.movingObjects = new Map<number , Movable>
-        this.gameLogic = new GameLogic(this.movingObjects , this.board, this);
-        this.renderer = new Renderer(this.movingObjects ,this.board , this );
+        this.gameState = new GameState();
+        this.gameLogic = new GameLogic(this.gameState , this.board, this);
+        this.renderer = new Renderer(this.gameState ,this.board , this );
 
 
     }
