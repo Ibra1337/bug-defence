@@ -1,7 +1,7 @@
-import {xDirection , yDirection , Movable} from "./Movable";
+import {xDirection , yDirection , Movable as PathFollower} from "./Movable";
 
 
-export class Tester extends Movable{
+export class Tester extends PathFollower{
 
     
     private readonly path :{x:number , y:number}[]
