@@ -45,7 +45,6 @@ export default class GameLogic {
     }
 
     public movePhase(){
-
         this.handleProjectiles();
         this.handleMobs();
         this.mediator.notify("GameLogic" , "MovePhaseEnd")
