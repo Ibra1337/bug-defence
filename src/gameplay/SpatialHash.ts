@@ -1,7 +1,7 @@
 export default class SpatialHash {
     private cellSize: number;
     private grid: Map<string, Set<number>>; 
-    private objectPositions: Map<number, { x: number, y: number, width: number, height: number, cellKeys: Set<string> }>; // Track occupied cells
+    private objectPositions: Map<number, { x: number, y: number, width: number, height: number, cellKeys: Set<string> }>; 
 
     constructor(cellSize: number) {
         this.cellSize = cellSize;

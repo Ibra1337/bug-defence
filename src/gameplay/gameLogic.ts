@@ -2,7 +2,7 @@ import { Movable, xDirection, yDirection } from "../geometry/movable.ts.ts";
 import IGameMediator from "./igameMediator.ts";
 import { PathFollower } from "../geometry/pathFollower.ts";
 import StraightProjectile from "./gameElements/projectiles/strightProjectile.ts";
-import GameState from "./gameState.ts";
+import GameState from "./GameState.ts";
 import SingleTartgetTower from "./gameElements/towers/singleTargetTower.ts";
 import ProjectileFactory from "./factories/projectileFactory.ts";
 import SpatialHash from "./SpatialHash.ts";
@@ -39,7 +39,8 @@ export default class GameLogic {
 
     public init(){
         this.generateMob();
-        this.generateProjectile();
+        //this.generateProjectile();
+        this.generateTower(700,700)
     }
 
     private checkAndHanleCollisons(l :Set<number> , projectile :Projectile ){
@@ -58,17 +59,22 @@ export default class GameLogic {
 
     private handleTower(tower: Tower): void {
         if (tower.isRedy(this.gameTimer)) {
+
             const targets = this.spatialHash.getObjectsInCircle(tower.xGetCenter() , tower.yGetCenter() , tower.range)
             if (targets.length > 0) {
-
-                let p = tower.shoot(this.gameTimer, targets);
+                
+                let p = tower.shoot(this.gameTimer, targets , this.gameState);
                 if (p!==null){
                     tower.setLastShootTimer(this.gameTimer); 
+                    this.gameState.addProjectile(p.id , p)
+                    console.log(this.gameState)
                 }
             }
         }
     }
-
+    private handleTowers():void{
+        this.gameState.getTowers().forEach(t => this.handleTower(t))
+    }
 
     private handleProjectiles() :void{        
         for (let object of this.gameState.getProjectiles().values()){
@@ -76,7 +82,6 @@ export default class GameLogic {
             const l = this.spatialHash.getNearbyObjects(object.x , object.y , object.width , object.height)
             if (l.size>0){
                 this.checkAndHanleCollisons(l , object)
-
             }
         }
 
@@ -95,6 +100,7 @@ export default class GameLogic {
     public movePhase(){
         this.handleProjectiles();
         this.handleMobs();
+        this.handleTowers()
         this.mediator.notify("GameLogic" , "MovePhaseEnd")
         this.gameTimer++;
     }

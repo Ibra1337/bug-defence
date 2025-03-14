@@ -6,7 +6,7 @@ import ProjectileFactory from "./projectileFactory";
 export default class TowerFactory{
 
     public createTower(x:number , y: number) :Tower{
-        return new SingleTartgetTower(x , y,45,45,"pink", 100,50, new ProjectileFactory())
+        return new SingleTartgetTower(x , y,45,45,"pink", 1000,100, new ProjectileFactory())
     }
     
 

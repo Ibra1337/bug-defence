@@ -2,7 +2,7 @@
 import { PathFollower } from "../geometry/pathFollower";
 import { xDirection , yDirection, Movable } from "../geometry/movable.ts";
 import IGameMediator from "../gameplay/igameMediator.ts";
-import GameState from "../gameplay/gameState.ts";
+import GameState from "../gameplay/GameState.ts";
 import Sprite from "./sprite.ts";
 
 export class Renderer {
@@ -34,7 +34,7 @@ export class Renderer {
 
     private drawMap(){
         this.ctx.fillStyle = "red";
-        console.log("map")
+
         let xRectWidth = this.canvas.width/ this.board.length;
         let yRectWidth = this.canvas.height / this.board[0].length
 

@@ -1,5 +1,7 @@
 import Sprite from "../../../GUI/sprite";
 import ProjectileFactory from "../../factories/projectileFactory";
+import GameState from "../../GameState";
+import SpatialHash from "../../SpatialHash";
 import Projectile from "../projectiles/projectile";
 
 export default abstract  class Tower extends Sprite{
@@ -14,11 +16,13 @@ export default abstract  class Tower extends Sprite{
             super(x,y,width,height,image)
          }
 
+    
+    //todo add stategy patern to choose target
 
-    abstract  shoot(gameTimer :number , targets :Array<[number, number]>):Projectile|null
+    abstract  shoot(gameTimer :number , targets :Array<[number, number]> , gameState :GameState):Projectile|null
     
     isRedy(currentTime :number): boolean{
-        return currentTime - this.lastShootTimer > 0
+        return  this.lastShootTimer +this.cooldown < currentTime
     }
         
     getLastSootTimer() :number{
