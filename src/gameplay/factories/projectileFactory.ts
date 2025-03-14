@@ -7,8 +7,8 @@ export default class ProjectileFactory{
         console.log("factory created")
     }
 
-    public createProjectile() :Projectile {
-        return new StraightProjectile(800 , 800, 40,20,"red",10, {x:0 , y:0})
+    public createProjectile(x :number , y :number) :Projectile {
+        return new StraightProjectile(x,y, 40,20,"red",10, {x:0 , y:0})
     }
 
     

@@ -1,15 +1,15 @@
-import ProjectileFactory from "../factories/projectileFactory";
+// import ProjectileFactory from "../factories/projectileFactory";
 
-export default abstract class Tower{
+// export default abstract class Tower{
     
-    constructor(private x :number, private y :number, 
-        private width :number , private height :number , 
-        range :number ,
-        private projectileFactory :ProjectileFactory ){}
+//     constructor( x :number,  y :number, 
+//          width :number ,  height :number , 
+//         range :number ,
+//          projectileFactory :ProjectileFactory ){}
 
 
-    public abstract shoot():void
+//     public abstract shoot():void
 
         
 
-}
+// }

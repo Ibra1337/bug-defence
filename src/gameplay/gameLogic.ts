@@ -42,7 +42,7 @@ export default class GameLogic {
         this.generateProjectile();
     }
 
-    private checkForCollisons(l :Set<number> , projectile :Projectile ){
+    private checkAndHanleCollisons(l :Set<number> , projectile :Projectile ){
         for(const id of l ){
             let mob = this.gameState.getMobs().get(id);
             if (!mob)
@@ -56,6 +56,18 @@ export default class GameLogic {
         }
     }
 
+    private handleTower(tower: Tower): void {
+        if (tower.isRedy(this.gameTimer)) {
+            const targets = this.spatialHash.getObjectsInCircle(tower.xGetCenter() , tower.yGetCenter() , tower.range)
+            if (targets.length > 0) {
+
+                let p = tower.shoot(this.gameTimer, targets);
+                if (p!==null){
+                    tower.setLastShootTimer(this.gameTimer); 
+                }
+            }
+        }
+    }
 
 
     private handleProjectiles() :void{        
@@ -63,7 +75,7 @@ export default class GameLogic {
             object.move(xDirection.LEFT , yDirection.STAY);
             const l = this.spatialHash.getNearbyObjects(object.x , object.y , object.width , object.height)
             if (l.size>0){
-                this.checkForCollisons(l , object)
+                this.checkAndHanleCollisons(l , object)
 
             }
         }
@@ -101,5 +113,8 @@ export default class GameLogic {
         rect1.y < rect2.y + rect2.height &&
         rect1.y + rect1.height > rect2.y;
     }
+
+
+    
 
 }

@@ -73,4 +73,40 @@ export default class SpatialHash {
         }
         return nearbyObjects;
     }
+    /**
+     * Return the sorted array as a list of pairs (distance, object ID).
+     * @param centerX 
+     * @param centerY 
+     * @param radius 
+     * @returns 
+     */
+    public getObjectsInCircle(centerX: number, centerY: number, radius: number): Array<[number, number]> {
+        const nearbyObjects: Array<[number, number]> = []; 
+        const searchCells = this.getCellKeys(centerX - radius, centerY - radius, radius * 2, radius * 2);
+    
+        for (const key of searchCells) {
+            if (this.grid.has(key)) {
+                for (const id of this.grid.get(key)!) {
+                    const obj = this.objectPositions.get(id);
+                    if (obj) {
+                        const objCenterX = obj.x + obj.width / 2;
+                        const objCenterY = obj.y + obj.height / 2;
+    
+                        const dx = objCenterX - centerX;
+                        const dy = objCenterY - centerY;
+    
+                        const distanceSquared = dx * dx + dy * dy;
+                        if (distanceSquared <= radius * radius * 1.1) {     
+                            nearbyObjects.push([Math.sqrt(distanceSquared), id]);
+                        }
+                    }
+                }
+            }
+        }
+    
+
+        nearbyObjects.sort((a, b) => a[0] - b[0]);
+    
+        return nearbyObjects;
+    }
 }
