@@ -1,5 +1,6 @@
 import Sprite from "../../../GUI/sprite";
 import ProjectileFactory from "../../factories/projectileFactory";
+import Projectile from "../projectiles/projectile";
 
 export default abstract  class Tower extends Sprite{
     
@@ -12,7 +13,7 @@ export default abstract  class Tower extends Sprite{
          }
 
 
-    abstract  shoot():void 
+    abstract  shoot():Projectile|null
     
         
 

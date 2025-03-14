@@ -18,5 +18,8 @@ export default abstract class Sprite {
         return this.y + this.height/2
     }
 
+    public static toRect(sprite :Sprite){
+        return {x: sprite.x , y: sprite.y , width: sprite.width , height :sprite.height}
+    }
 }
 
