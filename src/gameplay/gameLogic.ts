@@ -1,4 +1,4 @@
-import { Movable, xDirection, yDirection } from "../geometry/movable.ts.ts";
+import { Movable, xDirection, yDirection } from "../geometry/movable.ts";
 import IGameMediator from "./igameMediator.ts";
 import { PathFollower } from "../geometry/pathFollower.ts";
 import StraightProjectile from "./gameElements/projectiles/strightProjectile.ts";
@@ -9,8 +9,10 @@ import SpatialHash from "./SpatialHash.ts";
 import TowerFactory from "./factories/towerFactory.ts";
 import Tower from "./gameElements/towers/tower.ts";
 import Projectile from "./gameElements/projectiles/projectile.ts";
-import Sprite from "../GUI/sprite.ts";
-export default class GameLogic {
+import Sprite from "../GUI/Sprite.ts";
+import Mob from "./gameElements/mobs/Mob.ts";
+import TestMob from "./gameElements/mobs/TestMob.ts";
+export default class GameLogic implements IGameMediator {
 
     private path :{x:number , y:number}[];
     private spatialHash :SpatialHash;
@@ -20,22 +22,21 @@ export default class GameLogic {
     constructor(private gameState:GameState , private board :number[][] , private mediator :IGameMediator){
         this.path = [{x:50,y:50} , {x:50, y:700} ,{x:700, y:700}];
         console.log(this.board)
-        this.spatialHash = new SpatialHash(100);
-        this.towerFactroy = new TowerFactory();
+        this.spatialHash = new SpatialHash(25);
+        this.towerFactroy = new TowerFactory(this);
+
     }
 
+    
+
     private generateMob(): PathFollower {
-        let m = new PathFollower(100, 100, 100, 100,"blue", 1, this.path);
+        let m = new TestMob(100, 100, 100, 100,"blue", 1, 100, this.path , 1);
         this.gameState.addMob(m.id, m);
         this.spatialHash.insertObject(m.id , m.x , m.y , m.width , m.height);
         return m;
     }
 
-    private generateProjectile(): Projectile{
-        let p = new StraightProjectile(100,800,10,20,"red" , 1 , {x:30,y:0})
-        this.gameState.addProjectile(p.id , p);
-        return p;
-    }
+
 
     public init(){
         this.generateMob();
@@ -48,11 +49,10 @@ export default class GameLogic {
             let mob = this.gameState.getMobs().get(id);
             if (!mob)
                 continue
-            if(this.isColliding(
-                Sprite.toRect(mob) ,
-                Sprite.toRect(projectile)
+            if(this.isColliding(Sprite.toRect(mob) ,Sprite.toRect(projectile)
             )){
-                console.log("collison");
+                projectile.onCollision( mob )
+                
             }
         }
     }
@@ -78,20 +78,18 @@ export default class GameLogic {
 
     private handleProjectiles() :void{        
         for (let object of this.gameState.getProjectiles().values()){
-            object.move(xDirection.LEFT , yDirection.STAY);
+            object.move();
             const l = this.spatialHash.getNearbyObjects(object.x , object.y , object.width , object.height)
             if (l.size>0){
                 this.checkAndHanleCollisons(l , object)
             }
         }
-
-
     }
 
     private handleMobs() :void{
         for (let object of this.gameState.getMobs().values())
         {
-            object.move(xDirection.LEFT, yDirection.DOWN);
+            object.move();
             this.spatialHash.updateObject(object.id , object.x , object.y);
         
         }
@@ -121,6 +119,18 @@ export default class GameLogic {
     }
 
 
+    notify(sender: string, event: string, data?: any) {
+        switch (event) {
+            case "remove-mob":
+                this.gameState.removeMob(data);
+                break; 
+            case "remove-projectile":
+                this.gameState.removeProjectile(data);
+                break; 
+            default:
+                console.log(`Unknown event: ${event}`);
+        }
+    }
     
 
 }

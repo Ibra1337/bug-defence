@@ -1,12 +1,15 @@
 import Tower from "./gameElements/towers/tower.ts";
 import Projectile from "./gameElements/projectiles/projectile.ts";
-import { Movable } from "../geometry/movable.ts.ts";
-import Sprite from "../GUI/sprite.ts";
+import { Movable } from "../geometry/movable.ts";
+import Sprite from "../GUI/Sprite.ts";
+import Mob from "./gameElements/mobs/Mob.ts";
 
 export default class GameState {
+
+    private playerHealth = 100;
     private towers: Map<number, Tower>;
     private projectiles: Map<number, Projectile>;
-    private mobs: Map<number, Movable>;
+    private mobs: Map<number, Mob>;
 
     constructor() {
         this.towers = new Map();
@@ -22,7 +25,7 @@ export default class GameState {
         return this.projectiles;
     }
 
-    public getMobs(): ReadonlyMap<number, Movable> {
+    public getMobs(): ReadonlyMap<number, Mob> {
         return this.mobs;
     }
 
@@ -42,15 +45,21 @@ export default class GameState {
         this.projectiles.delete(id);
     }
 
-    public addMob(id: number, mob: Movable) {
+    public addMob(id: number, mob: Mob) {
         this.mobs.set(id, mob);
+    }
+    public getPlayerHealth():number{
+        return this.playerHealth;
+    }
+
+    public removeHp(amount :number){
+        this.playerHealth =- amount;
     }
 
     public removeMob(id: number) {
         this.mobs.delete(id);
     }
-
-     
+    
     public *iterateEntities<T>(entities: Map<number, T>): IterableIterator<T> {
         for (const entity of entities.values()) {
             yield entity;

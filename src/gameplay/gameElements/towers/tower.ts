@@ -1,4 +1,4 @@
-import Sprite from "../../../GUI/sprite";
+import Sprite from "../../../GUI/Sprite";
 import ProjectileFactory from "../../factories/projectileFactory";
 import GameState from "../../GameState";
 import SpatialHash from "../../SpatialHash";

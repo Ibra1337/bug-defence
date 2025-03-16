@@ -3,7 +3,7 @@ import { PathFollower } from "../geometry/pathFollower";
 import { xDirection , yDirection, Movable } from "../geometry/movable.ts";
 import IGameMediator from "../gameplay/igameMediator.ts";
 import GameState from "../gameplay/GameState.ts";
-import Sprite from "./sprite.ts";
+import Sprite from "./Sprite.ts";
 
 export class Renderer {
     //mutliple canvas
