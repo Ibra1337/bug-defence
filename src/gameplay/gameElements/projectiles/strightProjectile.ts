@@ -16,8 +16,10 @@ export default class StraightProjectile  extends Projectile{
     
     move(): void {
         let distance = this.moveToPoint(this.dest);
-        if(distance===0)
+        console.log("distance= " , distance)
+        if(distance <=5)
         {
+            console.log("remove")
             this.onDestinationReached()
         }
     }
@@ -26,6 +28,7 @@ export default class StraightProjectile  extends Projectile{
         const rem = mob.subtractHp(this.dmg) 
         console.log(rem)
         if (rem < 1){
+            console.log("removing")
             this.gameMediator.notify("projectile" , "remove-mob" , mob.id)
         }
         this.onRemove();

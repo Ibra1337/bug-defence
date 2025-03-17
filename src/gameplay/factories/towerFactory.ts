@@ -10,7 +10,7 @@ export default class TowerFactory{
 
 
     public createTower(x:number , y: number) :Tower{
-        return new SingleTartgetTower(x , y,45,45,"pink", 1000,100, new ProjectileFactory( this.mediator) )
+        return new SingleTartgetTower(x , y,45,45,"./public/images/inferno bow static.png", 1000,100, new ProjectileFactory( this.mediator) )
     }
     
 

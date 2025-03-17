@@ -30,7 +30,7 @@ export default class GameLogic implements IGameMediator {
     
 
     private generateMob(): PathFollower {
-        let m = new TestMob(100, 100, 100, 100,"blue", 1, 100, this.path , 1);
+        let m = new TestMob(100, 100, 50, 50,"./public/images/slime3.png", 1, 100, this.path , 1);
         this.gameState.addMob(m.id, m);
         this.spatialHash.insertObject(m.id , m.x , m.y , m.width , m.height);
         return m;
