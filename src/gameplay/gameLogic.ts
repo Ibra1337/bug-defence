@@ -12,6 +12,7 @@ import Projectile from "./gameElements/projectiles/projectile.ts";
 import Sprite from "../GUI/Sprite.ts";
 import Mob from "./gameElements/mobs/Mob.ts";
 import TestMob from "./gameElements/mobs/TestMob.ts";
+import { TowerType } from "./gameElements/towers/TowerType.ts";
 export default class GameLogic implements IGameMediator {
 
     private path :{x:number , y:number}[];
@@ -133,4 +134,17 @@ export default class GameLogic implements IGameMediator {
     }
     
 
+    handleTowerPlacement(){
+        //validate purchase 
+        
+    }
+
+    createTower(x:number , y:number , towerType: TowerType){
+        switch(towerType){
+            case(TowerType.Archer):
+                this.generateTower(x,y)
+                break
+            }
+    }
 }
+

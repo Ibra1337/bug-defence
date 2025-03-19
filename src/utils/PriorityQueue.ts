@@ -1,4 +1,4 @@
-class PriorityQueue<T> {
+export default class PriorityQueue<T> {
     private heap: { value: T, priority: number }[] = [];
     private comparator: (a: number, b: number) => number;
 
@@ -11,6 +11,7 @@ class PriorityQueue<T> {
         this.heap[i] = this.heap[j];
         this.heap[j] = temp;
     }
+
     private heapifyUp(index: number): void {
         let currentIndex = index;
         while (currentIndex > 0) {
@@ -34,7 +35,6 @@ class PriorityQueue<T> {
                 childIndexToCompare = rightChildIndex;
             }
 
-
             if (this.comparator(this.heap[currentIndex].priority, this.heap[childIndexToCompare].priority) <= 0) break;
 
             this.swap(currentIndex, childIndexToCompare);
@@ -47,7 +47,6 @@ class PriorityQueue<T> {
         this.heap.push(newNode);
         this.heapifyUp(this.heap.length - 1);
     }
-
 
     dequeue(): T | undefined {
         if (this.isEmpty()) return undefined;
@@ -66,7 +65,6 @@ class PriorityQueue<T> {
     peek(): T | undefined {
         return this.isEmpty() ? undefined : this.heap[0].value;
     }
-
 
     isEmpty(): boolean {
         return this.heap.length === 0;
