@@ -13,15 +13,21 @@ import Sprite from "../GUI/Sprite.ts";
 import Mob from "./gameElements/mobs/Mob.ts";
 import TestMob from "./gameElements/mobs/TestMob.ts";
 import { TowerType } from "./gameElements/towers/TowerType.ts";
+import findPath, { boardToPixelCoords, findStartAndEnd } from "../utils/PathUtills.ts";
 export default class GameLogic implements IGameMediator {
 
     private path :{x:number , y:number}[];
     private spatialHash :SpatialHash;
     private towerFactroy :TowerFactory
+    private board :number[][]
     private gameTimer =0;
 
-    constructor(private gameState:GameState , private board :number[][] , private mediator :IGameMediator){
-        this.path = [{x:50,y:50} , {x:50, y:700} ,{x:700, y:700}];
+    constructor(private gameState:GameState , board :number[][] , private mediator :IGameMediator){
+        this.board = board;
+        const startAndEnd = findStartAndEnd(board);
+        const boardPath = findPath(board, startAndEnd.start! , startAndEnd.end!)
+        const cords = boardToPixelCoords(boardPath!);
+        this.path = cords;
         console.log(this.board)
         this.spatialHash = new SpatialHash(25);
         this.towerFactroy = new TowerFactory(this);
@@ -60,7 +66,6 @@ export default class GameLogic implements IGameMediator {
 
     private handleTower(tower: Tower): void {
         if (tower.isRedy(this.gameTimer)) {
-
             const targets = this.spatialHash.getObjectsInCircle(tower.xGetCenter() , tower.yGetCenter() , tower.range)
             if (targets.length > 0) {
                 

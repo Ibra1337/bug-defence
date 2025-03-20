@@ -1,78 +1,244 @@
-class PriorityQueue<T> {
-    private heap: { value: T, priority: number }[] = [];
-    private comparator: (a: number, b: number) => number;
+import { PathFollower } from "../geometry/pathFollower";
+import { xDirection, yDirection, Movable } from "../geometry/movable.ts";
+import IGameMediator from "../gameplay/igameMediator.ts";
+import GameState from "../gameplay/GameState.ts";
+import Sprite from "./Sprite.ts";
+import Config from "../Config.ts";
+import { CellStatus } from "../types/CellStatus.ts";
 
-    constructor(comparator?: (a: number, b: number) => number) {
-        this.comparator = comparator || ((a, b) => a - b);
+
+
+export class Renderer {
+    private gameCanvas: HTMLCanvasElement;
+    private gameCtx: CanvasRenderingContext2D;
+
+    private mapCanvas: HTMLCanvasElement;
+    private mapCtx: CanvasRenderingContext2D;
+
+    private uiCanvas: HTMLCanvasElement;
+    private uiCtx: CanvasRenderingContext2D;
+
+    private inputCanvas: HTMLCanvasElement;
+    private inputCtx: CanvasRenderingContext2D;
+
+    private mediator: IGameMediator;
+    private gameState: GameState;
+
+    private imageCache: Map<string, HTMLImageElement>; 
+
+    constructor(gameState: GameState, private board: number[][], mediator: IGameMediator) {
+        this.gameState = gameState;
+        this.mediator = mediator;
+        this.imageCache = new Map<string, HTMLImageElement>();
+
+        this.mapCanvas = this.createCanvas(Config.width, Config.height, "mapCanvas");
+        this.mapCtx = this.mapCanvas.getContext("2d")!;
+
+        this.gameCanvas = this.createCanvas(Config.width, Config.height, "gameCanvas");
+        this.gameCtx = this.gameCanvas.getContext("2d")!;
+
+        this.uiCanvas = this.createCanvas(Config.width, Config.height, "uiCanvas");
+        this.uiCtx = this.uiCanvas.getContext("2d")!;
+
+        this.inputCanvas = this.createCanvas(Config.width, Config.height, "inputCanvas");
+        this.inputCtx = this.inputCanvas.getContext("2d")!;
+
+        this.setupCanvasStyles();
+        this.setupTowerMenu();
+        this.setupInputHandlers();
     }
 
-    private swap(i: number, j: number): void {
-        const temp = this.heap[i];
-        this.heap[i] = this.heap[j];
-        this.heap[j] = temp;
+
+    private createCanvas(width: number, height: number, id: string): HTMLCanvasElement {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.id = id;
+        document.body.appendChild(canvas);
+        return canvas;
     }
-    private heapifyUp(index: number): void {
-        let currentIndex = index;
-        while (currentIndex > 0) {
-            const parentIndex = Math.floor((currentIndex - 1) / 2);
-            if (this.comparator(this.heap[currentIndex].priority, this.heap[parentIndex].priority) >= 0) break;
-            this.swap(currentIndex, parentIndex);
-            currentIndex = parentIndex;
+
+
+    private getImage(src: string, callback: (img: HTMLImageElement) => void): void {
+        if (this.imageCache.has(src)) {
+            callback(this.imageCache.get(src)!);
+        } else {
+            const img = new Image();
+            img.src = src;
+            img.onload = () => {
+                this.imageCache.set(src, img);
+                callback(img);
+            };
         }
     }
 
-    private heapifyDown(index: number): void {
-        let currentIndex = index;
-        const lastIndex = this.heap.length - 1;
-
-        while (currentIndex * 2 + 1 <= lastIndex) {
-            const leftChildIndex = currentIndex * 2 + 1;
-            const rightChildIndex = currentIndex * 2 + 2;
-            let childIndexToCompare = leftChildIndex;
-
-            if (rightChildIndex <= lastIndex && this.comparator(this.heap[rightChildIndex].priority, this.heap[leftChildIndex].priority) < 0) {
-                childIndexToCompare = rightChildIndex;
+    private setupCanvasStyles() {
+        const style = `
+            canvas {
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+            #inputCanvas { z-index: 4; }
+            #uiCanvas { z-index: 3; }  
+            #gameCanvas { z-index: 2; }                       
+            #mapCanvas { z-index: 1;
+            background: url('./images/grass.png') center center ;
             }
 
+            #towerMenu {
+                position: absolute;
+                left: 820px;
+                top: 0;
+                width: 180px;
+                background: #222;
+                color: white;
+                padding: 10px;
+                font-family: Arial;
+                background: url('./images/menu_bg.png') center center no-repeat;
+                background-size: cover;
+            }
 
-            if (this.comparator(this.heap[currentIndex].priority, this.heap[childIndexToCompare].priority) <= 0) break;
+            #towerMenu button {
+                display: block;
+                width: 100%;
+                margin: 5px 0;
+                padding: 10px;
+                background: #444;
+                border: none;
+                color: white;
+                cursor: pointer;
+                font-size: 16px;
+            }
 
-            this.swap(currentIndex, childIndexToCompare);
-            currentIndex = childIndexToCompare;
+            #towerMenu button:hover {
+                background: #666;
+            }
+        `;
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = style;
+        document.head.appendChild(styleSheet);
+    }
+    private setupTowerMenu() {
+        const menuContainer = document.createElement("div");
+        menuContainer.id = "towerMenu";
+        menuContainer.innerHTML = `
+            <h3>Select Tower</h3>
+            <button class="tower-btn" data-type="Archer">🏹 Archer</button>
+            <button class="tower-btn" data-type="Mage">🪄 Mage</button>
+            <button class="tower-btn" data-type="Cannon">💣 Cannon</button>
+        `;
+        document.body.appendChild(menuContainer);
+
+        let selectedTower: string | null = null;
+
+        menuContainer.addEventListener("click", (e) => {
+            const target = e.target as HTMLElement;
+            if (target.classList.contains("tower-btn")) {
+                selectedTower = target.getAttribute("data-type");
+                this.mediator.notify("renderer" , "tower-selected" , selectedTower)
+            }
+        });
+
+        this.inputCanvas.addEventListener("click", (event) => {
+            const rect = this.inputCanvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            if (selectedTower) {
+                console.log(`Place ${selectedTower} tower at (${x}, ${y})`);
+                this.mediator.notify("renderer", "tower-place", { x: x, y: y });
+            }
+        });
+    }
+
+    drawMob(object: Sprite) {
+        this.getImage(object.color, (img) => {
+            this.gameCtx.drawImage(img, object.x, object.y, object.width, object.height);
+        });
+    }
+
+    private drawMapSquare(x: number, y: number, w: number, h: number): void {
+        const v = this.board[y][x];
+        let imgSrc: string; 
+        
+        switch (v) {
+            case CellStatus.Start:
+                imgSrc = "./images/path.png";
+                break;
+            case CellStatus.Path:
+                imgSrc = "./images/path1.png";
+                break;
+            case CellStatus.End:
+                imgSrc = "./images/path.png";
+                break;
+            default:
+                imgSrc = "./images/grass.png";
+        }
+    
+        this.getImage(imgSrc, (img) => {
+            this.mapCtx.drawImage(img, x * w, y * h, w, h);
+            this.mapCtx.strokeRect(x * w, y * h, w, h);
+        });
+    }
+    
+
+    private drawMap() {
+        console.log("Drawing map...");
+        this.mapCtx.clearRect(0, 0, this.mapCanvas.width, this.mapCanvas.height);
+        this.mapCtx.strokeStyle = "black";
+
+        const xRectWidth = this.mapCanvas.width / this.board.length;
+        const yRectWidth = this.mapCanvas.height / this.board[0].length;
+
+        for (let x = 0; x < this.board.length; x++) {
+            for (let y = 0; y < this.board[x].length; y++) {
+              
+                
+                this.drawMapSquare(x,y,xRectWidth,yRectWidth);
+
+
+            }
         }
     }
 
-    enqueue(value: T, priority: number): void {
-        const newNode = { value, priority };
-        this.heap.push(newNode);
-        this.heapifyUp(this.heap.length - 1);
+    private drawUI() {
+        this.uiCtx.clearRect(0, 0, this.uiCanvas.width, this.uiCanvas.height);
+        this.uiCtx.fillStyle = "white";
+        this.uiCtx.font = "30px Arial";
+        this.uiCtx.fillText("Player HP: 100", 10, 30);
+        this.uiCtx.strokeStyle = "black";
+        this.uiCtx.strokeText("Player HP: 100", 10, 30);
     }
 
+    private animate = () => {
+        this.gameCtx.clearRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
+        this.mediator.notify("renderer", "animate");
 
-    dequeue(): T | undefined {
-        if (this.isEmpty()) return undefined;
-
-        const minValue = this.heap[0].value;
-        const lastNode = this.heap.pop();
-
-        if (!this.isEmpty()) {
-            this.heap[0] = lastNode!;
-            this.heapifyDown(0);
+        for (const object of this.gameState.getAllEntities()) {
+            this.drawMob(object);
         }
 
-        return minValue;
+        this.drawUI();
+        requestAnimationFrame(this.animate);
+    };
+
+    public startAnimation() {
+        this.drawMap();
+        this.animate();
     }
 
-    peek(): T | undefined {
-        return this.isEmpty() ? undefined : this.heap[0].value;
-    }
-
-
-    isEmpty(): boolean {
-        return this.heap.length === 0;
-    }
-
-    size(): number {
-        return this.heap.length;
+    
+    
+    private setupInputHandlers() {
+        this.inputCanvas.addEventListener("click", (event) => {
+            const rect = this.inputCanvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            console.log(`Clicked at: (${x}, ${y})`);
+            this.inputCtx.fillStyle = "red";
+            this.inputCtx.beginPath();
+            this.inputCtx.arc(x, y, 5, 0, 2 * Math.PI);
+            this.inputCtx.fill();
+        });
     }
 }
