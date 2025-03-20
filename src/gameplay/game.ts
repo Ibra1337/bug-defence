@@ -21,17 +21,14 @@ export default class Game implements IGameMediator{
 
     constructor(){
         this.board = Array.from({ length: Config.blockNumber  }, () => Array(Config.blockNumber).fill(CellStatus.Free));
-        for (let i=0 ; i<10; i++ ){
-            this.board[i][0] = CellStatus.Path;
-        }
-        for (let i=0 ; i<10; i++ ){
-            this.board[9][i] = CellStatus.Path;
-        }
+
         this.board[0][0] = CellStatus.Start;
+        this.board[Config.blockNumber-2][Config.blockNumber-1] = CellStatus.End;
+        console.log(this.board)
         this.gameState = new GameState();
         this.gameLogic = new GameLogic(this.gameState , this.board, this);
         this.renderer = new Renderer(this.gameState ,this.board , this );
-
+       
     }
     notify(sender: string, event: string, data?: any): void {
         
