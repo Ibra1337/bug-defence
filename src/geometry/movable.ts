@@ -22,22 +22,28 @@ export abstract class Movable extends Sprite{
      * @param target targeted 
      * @returns distance from target
      */
-    protected moveToPoint(target :{x:number, y:number}) :number {
+    protected moveToPoint(target: { x: number; y: number }): number {
+
+        let centerX = this.x + this.width / 2;
+        let centerY = this.y + this.height / 2;
+    
+
         let direction = {
-            x: target.x - this.x ,
-            y: target.y - this.y
+            x: target.x - centerX,
+            y: target.y - centerY,
         };
-
+    
         let distance = Math.sqrt(direction.x ** 2 + direction.y ** 2);
-
+    
         if (distance > 0) {
-            direction.x /= distance;  
+            direction.x /= distance;
             direction.y /= distance;
-        }
+    
 
-        this.x += direction.x * this.speed;
-        this.y += direction.y * this.speed;
-        
+            this.x += direction.x * this.speed;
+            this.y += direction.y * this.speed;
+        }
+    
         return distance;
     }
 

@@ -2,7 +2,7 @@ import Config from "../Config";
 import { CellStatus } from "../types/CellStatus";
 import PriorityQueue from "./PriorityQueue";
 
-type Point = { x: number; y: number };
+export type Point = { x: number; y: number };
 
 class Cell {
     public parent: Point;
@@ -19,10 +19,10 @@ class Cell {
 }
 
 const DIRECTIONS = [
-    { x: 1, y: 0 },  // Right
-    { x: -1, y: 0 }, // Left
-    { x: 0, y: 1 },  // Down
-    { x: 0, y: -1 }  // Up
+    { x: 1, y: 0 },  
+    { x: -1, y: 0 }, 
+    { x: 0, y: 1 }, 
+    { x: 0, y: -1 } 
 ];
 
 function isValid(cell: Point, map: number[][]): boolean {
@@ -35,7 +35,7 @@ function isBlocked(cell: Point, map: number[][]): boolean {
 }
 
 function calculateHValue(current: Point, goal: Point): number {
-    // Manhattan distance for 4-direction movement
+    
     return Math.abs(current.x - goal.x) + Math.abs(current.y - goal.y);
 }
 

@@ -1,49 +1,77 @@
-import { Movable, xDirection, yDirection } from "../geometry/movable.ts";
+
 import IGameMediator from "./igameMediator.ts";
 import { PathFollower } from "../geometry/pathFollower.ts";
-import StraightProjectile from "./gameElements/projectiles/strightProjectile.ts";
 import GameState from "./GameState.ts";
-import SingleTartgetTower from "./gameElements/towers/singleTargetTower.ts";
-import ProjectileFactory from "./factories/projectileFactory.ts";
 import SpatialHash from "./SpatialHash.ts";
 import TowerFactory from "./factories/towerFactory.ts";
 import Tower from "./gameElements/towers/tower.ts";
 import Projectile from "./gameElements/projectiles/projectile.ts";
 import Sprite from "../GUI/Sprite.ts";
-import Mob from "./gameElements/mobs/Mob.ts";
 import TestMob from "./gameElements/mobs/TestMob.ts";
 import { TowerType } from "./gameElements/towers/TowerType.ts";
-import findPath, { boardToPixelCoords, findStartAndEnd } from "../utils/PathUtills.ts";
+import findPath, { boardToPixelCoords, findStartAndEnd, Point } from "../utils/PathUtills.ts";
+import { CellStatus } from "../types/CellStatus.ts";
+import Config from "../Config.ts";
 export default class GameLogic implements IGameMediator {
 
     private path :{x:number , y:number}[];
     private spatialHash :SpatialHash;
     private towerFactroy :TowerFactory
     private board :number[][]
+    private obstacles: Point[]
     private gameTimer =0;
+    private start: Point;
+    private end: Point;
 
     constructor(private gameState:GameState , board :number[][] , private mediator :IGameMediator){
         this.board = board;
         const startAndEnd = findStartAndEnd(board);
+        this.start = startAndEnd.start!;
+        this.end = startAndEnd.end!;
         const boardPath = findPath(board, startAndEnd.start! , startAndEnd.end!)
+        this.updateBoardWithPath(boardPath!)
         const cords = boardToPixelCoords(boardPath!);
         this.path = cords;
         console.log(this.board)
-        this.spatialHash = new SpatialHash(25);
+        this.spatialHash = new SpatialHash(100);
         this.towerFactroy = new TowerFactory(this);
-
+        this.obstacles = []
     }
 
-    
+    private updatePath(){
+        let nb = Array.from({ length: Config.blockNumber  }, () => Array(Config.blockNumber).fill(CellStatus.Free));
+        for(const o of this.obstacles)
+            nb[o.y][o.x] =CellStatus.Obstacle;
+        const boardPath = findPath(nb , this.start , this.end);
+        if(boardPath ===null)
+            throw console.error("handle illeagal tower placing");
+            
+        for (const el of boardPath!){
+            nb[el.y][el.x] = CellStatus.Path;
+        }
+        nb[this.start.y][this.start.y] = CellStatus.Start;
+        this.board[this.end.y][this.end.x] = CellStatus.End;
+        this.path = boardToPixelCoords(boardPath)
+        this.board = nb;
+    }
+
 
     private generateMob(): PathFollower {
+            
         let m = new TestMob(100, 100, 50, 50,"./public/images/slime3.png", 1, 100, this.path , 1);
         this.gameState.addMob(m.id, m);
         this.spatialHash.insertObject(m.id , m.x , m.y , m.width , m.height);
         return m;
     }
 
-
+    private updateBoardWithPath(path: Point[]){
+        for (const el of path)
+            this.board[el.y][el.x]=CellStatus.Path
+        this.board[this.start.y][this.start.x] = CellStatus.Start;
+        this.board[this.end.y][this.end.x] = CellStatus.End;
+        
+        console.log("after actualization: " , this.board)
+    }
 
     public init(){
         this.generateMob();
@@ -58,8 +86,9 @@ export default class GameLogic implements IGameMediator {
                 continue
             if(this.isColliding(Sprite.toRect(mob) ,Sprite.toRect(projectile)
             )){
-                projectile.onCollision( mob )
-                
+                projectile.onCollision(mob )
+                if(!this.gameState.getProjectiles().has(projectile.id))
+                    break
             }
         }
     }
@@ -106,7 +135,11 @@ export default class GameLogic implements IGameMediator {
         this.handleMobs();
         this.handleTowers()
         this.mediator.notify("GameLogic" , "MovePhaseEnd")
+        if(this.gameTimer%30===0){
+            this.generateMob()
+        }
         this.gameTimer++;
+
     }
 
     private generateTower(x :number, y :number):Tower{
