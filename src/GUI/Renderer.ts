@@ -198,6 +198,16 @@ export class Renderer {
         }
     }
 
+    public updateHP(){
+        this.uiCtx.clearRect(0, 0, this.uiCanvas.width, this.uiCanvas.height);
+        this.uiCtx.fillStyle = "white";
+        this.uiCtx.font = "30px Arial";
+        const text = JSON.stringify("Player HP: "+ this.gameState.getPlayerHealth())
+        this.uiCtx.fillText(text, 10, 30);
+        this.uiCtx.strokeStyle = "black";
+        this.uiCtx.strokeText("Player HP: 100", 10, 30);
+    }
+
     private drawUI() {
         this.uiCtx.clearRect(0, 0, this.uiCanvas.width, this.uiCanvas.height);
         this.uiCtx.fillStyle = "white";
