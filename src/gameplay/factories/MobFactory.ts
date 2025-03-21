@@ -2,7 +2,7 @@ import Mob from "../gameElements/mobs/Mob";
 import Config from "../../Config";
 export default class MobFactory{
 
-    constructor(private readonly path :{x:number , y:number}[] ,
+    constructor(private path :{x:number , y:number}[] ,
         private spawnPoint :{x: number , y: number}
     ){}
 

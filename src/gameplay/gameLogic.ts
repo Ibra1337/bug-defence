@@ -178,8 +178,13 @@ export default class GameLogic implements IGameMediator {
         }
         this.board[this.start.y][this.start.x] = CellStatus.Start;
         this.board[this.end.y][this.end.x] = CellStatus.End;
-        this.path = boardToPixelCoords(boardPath)
-        
+        var cords = boardToPixelCoords(boardPath)
+        for(let i =0 ; i<cords.length ; i++){
+            if(this.path.length<i)
+                this.path[i]= {x:cords[i].x , y: cords[i].y} 
+            else
+                this.path.push({x:cords[i].x , y: cords[i].y})
+        }
     }
 
     private handleTowerPlacement(x: number , y: number){
