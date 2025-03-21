@@ -1,7 +1,7 @@
 import {xDirection , yDirection , Movable} from "./movable.ts";
 
 
-export class PathFollower extends Movable{
+export abstract class PathFollower extends Movable{
 
     
     private readonly path :{x:number , y:number}[]
@@ -21,10 +21,14 @@ export class PathFollower extends Movable{
         let distance = this.moveToPoint(target);
         if (distance < this.speed) {
             this.destination++;
+            if(this.destination >= this.path.length)
+                this.onDestinationReached();
         }
+        
     }
 
+    protected abstract onDestinationReached(): void
 
-
+    
 
 }

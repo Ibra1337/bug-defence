@@ -42,7 +42,7 @@ export default class GameLogic implements IGameMediator {
 
     private generateMob(): PathFollower {
             
-        let m = new TestMob(100, 100, 50, 50,"./public/images/slime3.png", 1, 100, this.path , 1);
+        let m = new TestMob(100, 100, 50, 50,"./public/images/slime3.png", 1, 100, this.path , 1,this,3);
         this.gameState.addMob(m.id, m);
         this.spatialHash.insertObject(m.id , m.x , m.y , m.width , m.height);
         return m;
@@ -149,8 +149,18 @@ export default class GameLogic implements IGameMediator {
             case "remove-projectile":
                 this.gameState.removeProjectile(data);
                 break; 
+            case "base-reached":
+                this.gameState.removeMob(data.id)
+                this.gameState.removeHp(data.dmg)
+                if(this.gameState.getPlayerHealth() <= 0){
+                    console.log("Game Over")
+                    this.mediator.notify("game-logic" , "game-over")
+                }else{
+                    this.mediator.notify("game-logic" , "dmg-take")
+                }
+                break;
             default:
-                console.log(`Unknown event: ${event}`);
+            console.log(`Unknown event: ${event}`);
         }
     }
     
@@ -197,7 +207,6 @@ export default class GameLogic implements IGameMediator {
                 this.path.push(tmp[i])
         
             }
-            
         }
         
     }
@@ -239,5 +248,7 @@ export default class GameLogic implements IGameMediator {
                 break
             }
     }
+
+
 }
 

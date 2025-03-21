@@ -50,7 +50,14 @@ export default class Game implements IGameMediator{
             break;
         case "map-update":
             this.renderer.drawMap(); 
-        }
+            break;
+        case "game-over":
+            console.log("handle game over");
+            break
+        case "tmg-take":
+            this.renderer.updateHP();
+            break
+    }
     }
 
 
