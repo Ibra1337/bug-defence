@@ -165,20 +165,40 @@ export default class GameLogic implements IGameMediator {
             }
         }
     }
-    private findAndUpdatePath(){
+    private findAndUpdatePath(lastPlacement: {x:number, y:number}){
+        const cloned = this.board.map(row => row.slice());
         this.clearBoard()
         for(const o of this.obstacles)
             this.board[o.y][o.x] =CellStatus.Obstacle;
         const boardPath = findPath(this.board , this.start , this.end);
         if(boardPath ===null)
+        {
+            for(let y = 0; y< this.board.length; y++)
+                for(let x =0; x < this.board.length ; x++)
+                    this.board[y][x] = cloned[y][x];
+
+            this.board[lastPlacement.y][lastPlacement.x] = CellStatus.Path;
+            this.obstacles.pop()
             throw console.error("handle illeagal tower placing");
-            
+        }
         for (const el of boardPath!){
             this.board[el.y][el.x] = CellStatus.Path;
         }
         this.board[this.start.y][this.start.x] = CellStatus.Start;
         this.board[this.end.y][this.end.x] = CellStatus.End;
-        this.path = boardToPixelCoords(boardPath)
+        const tmp = boardToPixelCoords(boardPath);
+        console.log('???')
+        console.log(this.path.length)
+        for (let i=0; i<tmp.length; i++){
+            if(this.path.length>i){
+                console.log(i)
+                this.path[i] = tmp[i];
+            }else{
+                this.path.push(tmp[i])
+        
+            }
+            
+        }
         
     }
 
@@ -192,7 +212,7 @@ export default class GameLogic implements IGameMediator {
             console.log("path placement")
             this.board[y][x]= CellStatus.Obstacle;
             this.obstacles.push({x:x,y:y})
-            this.findAndUpdatePath();
+            this.findAndUpdatePath({x:x , y:y});
             console.log("=========================")
             console.log(this.board)
             this.mediator.notify("game-logic", "map-update")
@@ -201,7 +221,7 @@ export default class GameLogic implements IGameMediator {
             this.obstacles.push({x:x,y:y})
         }
         
-
+        console.log(this.board)
     }
 
     createTower(x:number , y:number , towerType: TowerType){
