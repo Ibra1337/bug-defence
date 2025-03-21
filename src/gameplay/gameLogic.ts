@@ -38,22 +38,6 @@ export default class GameLogic implements IGameMediator {
         this.obstacles = []
     }
 
-    private updatePath(){
-        let nb = Array.from({ length: Config.blockNumber  }, () => Array(Config.blockNumber).fill(CellStatus.Free));
-        for(const o of this.obstacles)
-            nb[o.y][o.x] =CellStatus.Obstacle;
-        const boardPath = findPath(nb , this.start , this.end);
-        if(boardPath ===null)
-            throw console.error("handle illeagal tower placing");
-            
-        for (const el of boardPath!){
-            nb[el.y][el.x] = CellStatus.Path;
-        }
-        nb[this.start.y][this.start.y] = CellStatus.Start;
-        this.board[this.end.y][this.end.x] = CellStatus.End;
-        this.path = boardToPixelCoords(boardPath)
-        this.board = nb;
-    }
 
 
     private generateMob(): PathFollower {
@@ -102,7 +86,6 @@ export default class GameLogic implements IGameMediator {
                 if (p!==null){
                     tower.setLastShootTimer(this.gameTimer); 
                     this.gameState.addProjectile(p.id , p)
-                    console.log(this.gameState)
                 }
             }
         }
@@ -172,12 +155,64 @@ export default class GameLogic implements IGameMediator {
     }
     
 
-    handleTowerPlacement(){
-        //validate purchase 
+    private validatePurchase(): boolean{
+        return true;
+    }
+    private clearBoard(value: number = CellStatus.Free) {
+        for (let y = 0; y < this.board.length; y++) {
+            for (let x = 0; x < this.board[y].length; x++) {
+                this.board[y][x] = value;
+            }
+        }
+    }
+    private findAndUpdatePath(){
+        this.clearBoard()
+        for(const o of this.obstacles)
+            this.board[o.y][o.x] =CellStatus.Obstacle;
+        const boardPath = findPath(this.board , this.start , this.end);
+        if(boardPath ===null)
+            throw console.error("handle illeagal tower placing");
+            
+        for (const el of boardPath!){
+            this.board[el.y][el.x] = CellStatus.Path;
+        }
+        this.board[this.start.y][this.start.x] = CellStatus.Start;
+        this.board[this.end.y][this.end.x] = CellStatus.End;
+        this.path = boardToPixelCoords(boardPath)
         
     }
 
+    private handleTowerPlacement(x: number , y: number){
+
+        if (!this.validatePurchase())
+            return;
+        if(this.board[y][x]===CellStatus.Obstacle || this.board[y][x] === CellStatus.Start || this.board[y][x] === CellStatus.End){
+            this.mediator.notify("game-logic" , "invalid-tower-placement")
+        }else if (this.board[y][x] === CellStatus.Path){
+            console.log("path placement")
+            this.board[y][x]= CellStatus.Obstacle;
+            this.obstacles.push({x:x,y:y})
+            this.findAndUpdatePath();
+            console.log("=========================")
+            console.log(this.board)
+            this.mediator.notify("game-logic", "map-update")
+        }else{
+            this.board[y][x]= CellStatus.Obstacle;
+            this.obstacles.push({x:x,y:y})
+        }
+        
+
+    }
+
     createTower(x:number , y:number , towerType: TowerType){
+
+        this.handleTowerPlacement(x,y)
+        const xs = Config.width / Config.blockNumber;
+        const ys = Config.height / Config.blockNumber;
+        x = x*xs + xs/2;
+        y = y*ys + ys/2;
+        console.log("creating tower: " , x," " ,y)
+        
         switch(towerType){
             case(TowerType.Archer):
                 this.generateTower(x,y)

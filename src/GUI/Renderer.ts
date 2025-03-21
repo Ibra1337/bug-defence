@@ -182,8 +182,9 @@ export class Renderer {
     }
     
 
-    private drawMap() {
+    public drawMap() {
         console.log("Drawing map...");
+        console.log(this.board)
         this.mapCtx.clearRect(0, 0, this.mapCanvas.width, this.mapCanvas.height);
         this.mapCtx.strokeStyle = "black";
 
@@ -192,11 +193,7 @@ export class Renderer {
 
         for (let x = 0; x < this.board.length; x++) {
             for (let y = 0; y < this.board[x].length; y++) {
-              
-                
                 this.drawMapSquare(x,y,xRectWidth,yRectWidth);
-
-
             }
         }
     }
@@ -234,11 +231,7 @@ export class Renderer {
             const rect = this.inputCanvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
-            console.log(`Clicked at: (${x}, ${y})`);
-            this.inputCtx.fillStyle = "red";
-            this.inputCtx.beginPath();
-            this.inputCtx.arc(x, y, 5, 0, 2 * Math.PI);
-            this.inputCtx.fill();
+     
         });
     }
 }

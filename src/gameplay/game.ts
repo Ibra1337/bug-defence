@@ -38,7 +38,9 @@ export default class Game implements IGameMediator{
             break;
         case "tower-place":
             console.log("tower placed at - from game" , data)
-            this.gameLogic.createTower(data.x, data.y , this.selectedTower)
+            const xs = Config.width / Config.blockNumber;
+            const ys = Config.height / Config.blockNumber;
+            this.gameLogic.createTower(Math.floor(data.x /xs ),Math.floor( data.y /ys), this.selectedTower);
             break;
         case "tower-selected":
             console.log("tower-selection: " , data)
@@ -46,6 +48,8 @@ export default class Game implements IGameMediator{
             this.selectedTower = TowerType[data as keyof typeof TowerType];
             console.log("after selection: " , this.selectedTower)
             break;
+        case "map-update":
+            this.renderer.drawMap(); 
         }
     }
 

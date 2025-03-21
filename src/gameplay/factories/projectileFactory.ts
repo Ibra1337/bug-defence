@@ -10,7 +10,7 @@ export default class ProjectileFactory{
 
     public createProjectile(x :number , y :number ,target  :{x:number , y:number}) :Projectile {
         console.log("projectile created")
-        return new StraightProjectile(x,y, 40,20,"./public/images/arrow_stratight.png",10,50 , this.mediator , target)
+        return new StraightProjectile(x,y, 40,20,"./public/images/arrow_stratight.png",10,0 , this.mediator , target)
     }
 
     
