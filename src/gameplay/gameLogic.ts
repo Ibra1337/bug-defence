@@ -42,7 +42,7 @@ export default class GameLogic implements IGameMediator {
 
     private generateMob(): PathFollower {
             
-        let m = new TestMob(100, 100, 50, 50,"./public/images/slime3.png", 1, 100, this.path , 1,this,3);
+        let m = new TestMob(100, 100, 50, 50,"./public/images/slime3.png", 3, 100, this.path , 1,this,3);
         this.gameState.addMob(m.id, m);
         this.spatialHash.insertObject(m.id , m.x , m.y , m.width , m.height);
         return m;
@@ -125,10 +125,22 @@ export default class GameLogic implements IGameMediator {
 
     }
 
-    private generateTower(x :number, y :number):Tower{
-        let t = this.towerFactroy.createTower(x,y)
-        this.gameState.addTower(t.id , t);
-        return t;
+    private generateTower(x :number, y :number , towerType :TowerType):Tower{
+        let t:Tower;
+        switch(towerType){
+            case TowerType.Archer:
+                t =  this.towerFactroy.createArcherTower(x,y)
+                break;
+            case TowerType.Mage:
+                t = this.towerFactroy.createMageTower(x,y);
+                break;
+            default:
+                t = t = this.towerFactroy.createMageTower(x,y);
+
+        }
+
+        this.gameState.addTower(t!.id , t!);
+        return t!;
     }
 
 
@@ -150,8 +162,12 @@ export default class GameLogic implements IGameMediator {
                 this.gameState.removeProjectile(data);
                 break; 
             case "base-reached":
+                console.log("before: " , this.gameState.getPlayerHealth())
+
                 this.gameState.removeMob(data.id)
                 this.gameState.removeHp(data.dmg)
+                console.log("after: " , this.gameState.getPlayerHealth())
+
                 if(this.gameState.getPlayerHealth() <= 0){
                     console.log("Game Over")
                     this.mediator.notify("game-logic" , "game-over")
@@ -166,6 +182,8 @@ export default class GameLogic implements IGameMediator {
     
 
     private validatePurchase(): boolean{
+        
+        
         return true;
     }
     private clearBoard(value: number = CellStatus.Free) {
@@ -196,15 +214,6 @@ export default class GameLogic implements IGameMediator {
         }
         this.board[this.start.y][this.start.x] = CellStatus.Start;
         this.board[this.end.y][this.end.x] = CellStatus.End;
-<<<<<<< HEAD
-        var cords = boardToPixelCoords(boardPath)
-        for(let i =0 ; i<cords.length ; i++){
-            if(this.path.length<i)
-                this.path[i]= {x:cords[i].x , y: cords[i].y} 
-            else
-                this.path.push({x:cords[i].x , y: cords[i].y})
-        }
-=======
         const tmp = boardToPixelCoords(boardPath);
         console.log('???')
         console.log(this.path.length)
@@ -218,7 +227,6 @@ export default class GameLogic implements IGameMediator {
             }
         }
         
->>>>>>> d230901c1030ebab36724a4850e1f098fb0f605e
     }
 
     private handleTowerPlacement(x: number , y: number){
@@ -228,12 +236,9 @@ export default class GameLogic implements IGameMediator {
         if(this.board[y][x]===CellStatus.Obstacle || this.board[y][x] === CellStatus.Start || this.board[y][x] === CellStatus.End){
             this.mediator.notify("game-logic" , "invalid-tower-placement")
         }else if (this.board[y][x] === CellStatus.Path){
-            console.log("path placement")
             this.board[y][x]= CellStatus.Obstacle;
             this.obstacles.push({x:x,y:y})
             this.findAndUpdatePath({x:x , y:y});
-            console.log("=========================")
-            console.log(this.board)
             this.mediator.notify("game-logic", "map-update")
         }else{
             this.board[y][x]= CellStatus.Obstacle;
@@ -244,7 +249,6 @@ export default class GameLogic implements IGameMediator {
     }
 
     createTower(x:number , y:number , towerType: TowerType){
-
         this.handleTowerPlacement(x,y)
         const xs = Config.width / Config.blockNumber;
         const ys = Config.height / Config.blockNumber;

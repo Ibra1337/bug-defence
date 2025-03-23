@@ -25,6 +25,7 @@ export class Renderer {
     private gameState: GameState;
 
     private imageCache: Map<string, HTMLImageElement>; 
+    private animaate = true;
 
     constructor(gameState: GameState, private board: number[][], mediator: IGameMediator) {
         this.gameState = gameState;
@@ -198,14 +199,20 @@ export class Renderer {
         }
     }
 
-    public updateHP(){
+    public updateHP() {
+        const hp = this.gameState.getPlayerHealth();
+        console.log("HP: ", hp);
+    
         this.uiCtx.clearRect(0, 0, this.uiCanvas.width, this.uiCanvas.height);
+    
         this.uiCtx.fillStyle = "white";
         this.uiCtx.font = "30px Arial";
-        const text = JSON.stringify("Player HP: "+ this.gameState.getPlayerHealth())
+    
+        const text = `Player HP: ${hp}`;
         this.uiCtx.fillText(text, 10, 30);
+    
         this.uiCtx.strokeStyle = "black";
-        this.uiCtx.strokeText("Player HP: 100", 10, 30);
+        this.uiCtx.strokeText(text, 10, 30);
     }
 
     private drawUI() {
@@ -223,18 +230,20 @@ export class Renderer {
 
         for (const object of this.gameState.getAllEntities()) {
             this.drawMob(object);
-        }
-
-        this.drawUI();
+        }    
+        if(this.animaate)
         requestAnimationFrame(this.animate);
     };
 
     public startAnimation() {
+        this.updateHP();
         this.drawMap();
         this.animate();
     }
 
-    
+    public stopAnimation(){
+        this.animaate = false;
+    }
     
     private setupInputHandlers() {
         this.inputCanvas.addEventListener("click", (event) => {

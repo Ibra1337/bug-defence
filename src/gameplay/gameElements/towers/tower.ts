@@ -17,7 +17,6 @@ export default abstract  class Tower extends Sprite{
          }
 
     
-    //todo add stategy patern to choose target
 
     abstract  shoot(gameTimer :number , targets :Array<[number, number]> , gameState :GameState):Projectile|null
     

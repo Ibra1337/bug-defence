@@ -6,6 +6,7 @@ import Mob from "./gameElements/mobs/Mob.ts";
 
 export default class GameState {
 
+    private gold = 100;
     private playerHealth = 100;
     private towers: Map<number, Tower>;
     private projectiles: Map<number, Projectile>;
@@ -53,7 +54,7 @@ export default class GameState {
     }
 
     public removeHp(amount :number){
-        this.playerHealth =- amount;
+        this.playerHealth -= amount;
     }
 
     public removeMob(id: number) {
@@ -75,4 +76,13 @@ export default class GameState {
             yield* this.iterateEntities(this.mobs);
         }
 
+
+    public getGold(): number{
+        return this.gold;
+    }
+    public subtractGold(price: number){
+        const res = this.gold = price;
+        if (res >= 0)
+            this.gold = res;
+    }
 }

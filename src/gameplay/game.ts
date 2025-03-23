@@ -1,5 +1,5 @@
 import { Movable } from "../geometry/movable.ts";
-import { Renderer } from "../GUI/Renderer";
+import { Renderer } from "../GUI/Renderer.ts";
 import { TowerType } from "./gameElements/towers/TowerType.ts";
 import GameLogic from "./gameLogic.ts";
 import GameState from "./GameState.ts";
@@ -17,7 +17,7 @@ export default class Game implements IGameMediator{
     private board :number[][];
 
     private selectedTower  = TowerType.None;
-    
+    private gameOver = false;    
 
     constructor(){
         this.board = Array.from({ length: Config.blockNumber  }, () => Array(Config.blockNumber).fill(CellStatus.Free));
@@ -28,7 +28,6 @@ export default class Game implements IGameMediator{
         this.gameState = new GameState();
         this.gameLogic = new GameLogic(this.gameState , this.board, this);
         this.renderer = new Renderer(this.gameState ,this.board , this );
-       
     }
     notify(sender: string, event: string, data?: any): void {
         
@@ -39,7 +38,7 @@ export default class Game implements IGameMediator{
         case "tower-place":
             console.log("tower placed at - from game" , data)
             const xs = Config.width / Config.blockNumber;
-            const ys = Config.height / Config.blockNumber;
+            const ys = Config.height / Config.blockNumber;     
             this.gameLogic.createTower(Math.floor(data.x /xs ),Math.floor( data.y /ys), this.selectedTower);
             break;
         case "tower-selected":
@@ -53,8 +52,9 @@ export default class Game implements IGameMediator{
             break;
         case "game-over":
             console.log("handle game over");
+            this.renderer.stopAnimation();
             break
-        case "tmg-take":
+        case "dmg-take":
             this.renderer.updateHP();
             break
     }
