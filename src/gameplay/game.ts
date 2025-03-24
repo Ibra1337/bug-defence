@@ -14,9 +14,11 @@ export default class Game implements IGameMediator{
     private gameLogic :GameLogic
     private gameState :GameState
 
+    
     private board :number[][];
 
-    private selectedTower  = TowerType.None;
+        private selectedTower  = "none";
+
     private gameOver = false;    
 
     constructor(){
@@ -38,13 +40,13 @@ export default class Game implements IGameMediator{
         case "tower-place":
             console.log("tower placed at - from game" , data)
             const xs = Config.width / Config.blockNumber;
-            const ys = Config.height / Config.blockNumber;     
+            const ys = Config.height / Config.blockNumber; 
+            console.log("<>?<>: " ,this.selectedTower)
             this.gameLogic.createTower(Math.floor(data.x /xs ),Math.floor( data.y /ys), this.selectedTower);
             break;
         case "tower-selected":
             console.log("tower-selection: " , data)
-            let datas = data as string;
-            this.selectedTower = TowerType[data as keyof typeof TowerType];
+            this.selectedTower = data
             console.log("after selection: " , this.selectedTower)
             break;
         case "map-update":

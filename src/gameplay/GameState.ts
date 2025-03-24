@@ -6,7 +6,7 @@ import Mob from "./gameElements/mobs/Mob.ts";
 
 export default class GameState {
 
-    private gold = 100;
+    private gold = 300;
     private playerHealth = 100;
     private towers: Map<number, Tower>;
     private projectiles: Map<number, Projectile>;

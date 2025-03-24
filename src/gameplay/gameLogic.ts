@@ -60,7 +60,7 @@ export default class GameLogic implements IGameMediator {
     public init(){
         this.generateMob();
         //this.generateProjectile();
-        this.generateTower(700,700)
+        //this.generateTower(700,700 ,"Mage" )
     }
 
     private checkAndHanleCollisons(l :Set<number> , projectile :Projectile ){
@@ -125,16 +125,20 @@ export default class GameLogic implements IGameMediator {
 
     }
 
-    private generateTower(x :number, y :number , towerType :TowerType):Tower{
+    private generateTower(x :number, y :number , towerType :string):Tower{
         let t:Tower;
+        console.log("gen: ", towerType)
         switch(towerType){
             case TowerType.Archer:
+                console.log("archer placed")
                 t =  this.towerFactroy.createArcherTower(x,y)
                 break;
             case TowerType.Mage:
+                console.log("mage placed")
                 t = this.towerFactroy.createMageTower(x,y);
                 break;
             default:
+                console.log("ass placed")
                 t = t = this.towerFactroy.createMageTower(x,y);
 
         }
@@ -248,7 +252,7 @@ export default class GameLogic implements IGameMediator {
         console.log(this.board)
     }
 
-    createTower(x:number , y:number , towerType: TowerType){
+    createTower(x:number , y:number , towerType: string){
         this.handleTowerPlacement(x,y)
         const xs = Config.width / Config.blockNumber;
         const ys = Config.height / Config.blockNumber;
@@ -256,11 +260,8 @@ export default class GameLogic implements IGameMediator {
         y = y*ys + ys/2;
         console.log("creating tower: " , x," " ,y)
         
-        switch(towerType){
-            case(TowerType.Archer):
-                this.generateTower(x,y)
-                break
-            }
+        this.generateTower(x,y , towerType)
+
     }
 
 

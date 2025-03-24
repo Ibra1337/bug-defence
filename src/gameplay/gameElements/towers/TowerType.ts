@@ -1,6 +1,6 @@
-export enum TowerType {
+export const enum TowerType {
     None = "none",
-    Archer = "archer",
-    Mage = "mage",
-    Cannon = "cannon"
+    Archer = "Archer",
+    Mage = "Mage",
+    Cannon = "Cannon"
 }

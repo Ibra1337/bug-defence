@@ -1,4 +1,4 @@
-import StraightProjectile from "../gameElements/projectiles/StrightProjectile";
+import StraightProjectile from "../gameElements/projectiles/strightProjectile";
 import Tower from "../gameElements/towers/tower";
 import SingleTartgetTower from "../gameElements/towers/singleTargetTower";
 import ProjectileFactory from "./projectileFactory";
@@ -43,7 +43,7 @@ export default class TowerFactory {
             adjustedY,
             width,
             height,
-            "./images/fireball.png",
+            "./images/mageTower.png",
             1000,
             100,
             this.projectileFactory
