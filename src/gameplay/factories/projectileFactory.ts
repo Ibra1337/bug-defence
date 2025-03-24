@@ -15,6 +15,6 @@ export default class ProjectileFactory{
     }
 
     public createMageProjectile(x :number , y :number ,target  :{x:number , y:number}){
-        return new PircingProjectile(x,y, 40,20,"./public/images/fireball.png",10,0 , this.mediator , target,null)
+        return new PircingProjectile(x,y, 40,40,"./public/images/fireball.png",50,50 , this.mediator , target,null)
     }
 } 

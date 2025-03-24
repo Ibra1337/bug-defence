@@ -11,7 +11,7 @@ export default class MobFactory{
     public createSlime():Mob {
         let size = Math.floor(Config.width/Config.blockNumber *0.75)
         return new Mob(this.spawnPoint.x , this.spawnPoint.y ,size ,size ,
-            "./images/slime.png",10,10,this.path,1,this.mediator,3);
+            "./images/slime.png",1,1,this.path,1,this.mediator,1);
     }
 
 

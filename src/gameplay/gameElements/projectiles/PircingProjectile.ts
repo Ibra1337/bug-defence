@@ -19,7 +19,7 @@ export default class PircingProjectile  extends Projectile{
     move(): void {
         let distance = this.moveToPoint(this.dest);
 
-        if(distance <=5)
+        if(distance <=this.speed+1)
         {
             console.log("remove on distance")
             this.onDestinationReached()
@@ -36,6 +36,7 @@ export default class PircingProjectile  extends Projectile{
                 this.pirced.add(mob.id)
             }
         }else if (this.targetCapacity! <= this.pirced.size && !this.pirced.has(mob.id)) {
+            console.log("DMG?")
             const rem = mob.subtractHp(this.dmg) 
             if (rem < 1){
                 this.gameMediator.notify("projectile" , "remove-mob" , mob.id)

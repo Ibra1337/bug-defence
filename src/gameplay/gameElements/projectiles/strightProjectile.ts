@@ -17,7 +17,7 @@ export default class StraightProjectile  extends Projectile{
     move(): void {
         let distance = this.moveToPoint(this.dest);
 
-        if(distance <=5)
+        if(distance <=this.speed+1)
         {
             console.log("remove")
             this.onDestinationReached()
