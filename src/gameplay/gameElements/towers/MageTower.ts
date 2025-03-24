@@ -18,4 +18,9 @@ export default class MageTower extends Tower {
         return null;
     }
 
+    private findTarget():{x:number,y:number} {
+        //Todo: implemnt so the projectile will fly untill target reached at max distance;
+
+    }
+
 }
