@@ -11,10 +11,10 @@ export default class ProjectileFactory{
 
     public createProjectile(x :number , y :number ,target  :{x:number , y:number}) :Projectile {
         console.log("projectile created")
-        return new StraightProjectile(x,y, 40,20,"./public/images/arrow_stratight.png",10,0 , this.mediator , target)
+        return new StraightProjectile(x,y, 50,50,"./public/images/arrow_stratight.png",10,0 , this.mediator , target)
     }
 
     public createMageProjectile(x :number , y :number ,target  :{x:number , y:number}){
-        return new PircingProjectile(x,y, 40,40,"./public/images/fireball.png",50,50 , this.mediator , target,null)
+        return new PircingProjectile(x,y, 50,50,"./public/images/fireball.png",50,50 , this.mediator , target,null)
     }
 } 
