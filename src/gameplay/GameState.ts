@@ -26,7 +26,7 @@ export default class GameState {
         return this.projectiles;
     }
 
-    public getMobs(): ReadonlyMap<number, Mob> {
+    public getMobs(): Map<number, Mob> {
         return this.mobs;
     }
 

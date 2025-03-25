@@ -2,7 +2,7 @@
 import IGameMediator from "./igameMediator.ts";
 import { PathFollower } from "../geometry/pathFollower.ts";
 import GameState from "./GameState.ts";
-import SpatialHash from "./SpatialHash.ts";
+import SpatialHash from "../utils/SpatialHash.ts";
 import TowerFactory from "./factories/towerFactory.ts";
 import Tower from "./gameElements/towers/tower.ts";
 import Projectile from "./gameElements/projectiles/projectile.ts";
@@ -79,10 +79,12 @@ export default class GameLogic implements IGameMediator {
 
     private handleTower(tower: Tower): void {
         if (tower.isRedy(this.gameTimer)) {
-            const targets = this.spatialHash.getObjectsInCircle(tower.xGetCenter() , tower.yGetCenter() , tower.range)
-            console.log(tower.id ,"????: " ,targets)
-            const shoot = targets.length > 0;
-            console.log(targets.length , ": " , shoot)
+            const hash = this.spatialHash.getObjectsInCircle(tower.xGetCenter() , tower.yGetCenter() , tower.range)
+
+            const targets = getMobsSortedByDistance(this.gameState.getMobs,hash , tower.x, tower.y)
+
+            const shoot = targets.size > 0;
+            console.log(targets.size , ": " , shoot)
             if (shoot) {
                 console.log("shooting: " , tower.id)
                 let p = tower.shoot(this.gameTimer, targets , this.gameState);
@@ -117,7 +119,7 @@ export default class GameLogic implements IGameMediator {
         for (let object of this.gameState.getMobs().values())
         {
             object.move();
-            this.spatialHash.updateObject(object.id , object.x , object.y);
+            this.spatialHash.updateObject(object.id , object.x , object.y,object.width,object.height);
         
         }
     }
@@ -169,7 +171,7 @@ export default class GameLogic implements IGameMediator {
     notify(sender: string, event: string, data?: any) {
         switch (event) {
             case "remove-mob":
-                this.spatialHash.removeObject(data.id)
+                this.spatialHash.remove(data.id)
                 
                 this.gameState.removeMob(data);
                 break; 
@@ -180,7 +182,7 @@ export default class GameLogic implements IGameMediator {
                 console.log("before: " , this.gameState.getPlayerHealth())
 
                 this.gameState.removeMob(data.id)
-                this.spatialHash.removeObject(data.id)
+                this.spatialHash.remove(data.id)
                 this.gameState.removeHp(data.dmg)
                 console.log("after: " , this.gameState.getPlayerHealth())
 
@@ -275,6 +277,9 @@ export default class GameLogic implements IGameMediator {
         this.generateTower(x,y , towerType)
 
     }
+
+
+
 
 
 }

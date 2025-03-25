@@ -1,6 +1,8 @@
-interface Point { x: number, y: number }
+import Mob from "../gameplay/gameElements/mobs/Mob";
 
-class SpatialHash {
+ export interface Point { x: number, y: number }
+
+export default class SpatialHash {
     private spaceMap = new Map<string, Set<number>>();
     private keyMap = new Map<number, Set<string>>();
 
@@ -70,4 +72,88 @@ class SpatialHash {
 
         console.log(`Updated object ${id}, total tracked objects: ${this.keyMap.size}`);
     }
+
+    public getNearbyObjects(x: number, y: number, w: number, h: number): Set<number> {
+        const keys = this.hash(x, y, w, h);
+        let result = new Set<number>();
+    
+        for (const key of keys) {
+            const cell = this.spaceMap.get(key);
+            if (cell) {
+                for (const id of cell) {
+                    result.add(id);
+                }
+            }
+        }
+    
+        return result;
+    }
+
+
+    public getObjectsInCircle(centerX: number, centerY: number, radius: number): Set<number> {
+        const keys = this.hash(centerX - radius, centerY - radius, radius * 2, radius * 2);
+        let result = new Set<number>();
+        const radiusSquared = radius * radius;
+        console.log(keys)
+        for (const key of keys) {
+            const cell = this.spaceMap.get(key);
+            if (cell) {
+                for (const id of cell) {
+                    let objKeys = this.keyMap.get(id);
+                    if (objKeys) {
+                        for (const objKey of objKeys) {
+                            const [cellX, cellY] = objKey.split(',').map(Number);
+                            const objMinX = cellX * this.chunkSize;
+                            const objMinY = cellY * this.chunkSize;
+                            const objMaxX = objMinX + this.chunkSize;
+                            const objMaxY = objMinY + this.chunkSize;
+
+                            const closestX = Math.max(objMinX, Math.min(centerX, objMaxX));
+                            const closestY = Math.max(objMinY, Math.min(centerY, objMaxY));
+    
+                            const dx = closestX - centerX;
+                            const dy = closestY - centerY;
+    
+                            if (dx * dx + dy * dy <= radiusSquared) {
+                                result.add(id);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    
+        return result;
+    }
+    
+
+    
+
+    public getTotalObjects(): number {
+        return this.keyMap.size;
+    }
+    
+    public getTotalCells(): number {
+        return this.spaceMap.size;
+    }
+    
+}
+export function getMobsSortedByDistance(
+    mobs: Map<number, Mob>,
+    ids: Set<number>,
+    x: number,
+    y: number
+): { mob: Mob; distance: number }[] {  
+    return Array.from(ids)
+        .map(id => {
+            const mob = mobs.get(id);
+            if (!mob) return null; 
+            const dx = mob.x - x;
+            const dy = mob.y - y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return { mob, distance };  
+        })
+        .filter((entry): entry is { mob: Mob; distance: number } => entry !== null) 
+        .sort((a, b) => a.distance - b.distance);  
 }
