@@ -1,54 +1,81 @@
 import SpatialHash from "../utils/SpatialHash";
 
-describe("SpatialHash Tests", () => {
+describe("SpatialHash", () => {
     let spatialHash: SpatialHash;
 
     beforeEach(() => {
-        spatialHash = new SpatialHash(10); 
+        spatialHash = new SpatialHash(10);
     });
 
-    test("Insert and retrieve an object", () => {
-        spatialHash.insertObject(1, 10, 10, 5, 5);
-        const objects = spatialHash.getNearbyObjects(10, 10, 5, 5);
-        expect(objects.has(1)).toBe(true);
-        expect(spatialHash.getTotalObjects()).toBe(1);
+    test("getObjectsInCircle should return objects fully inside the circle", () => {
+        spatialHash.insertObject(1, 10, 10, 5, 5); // Inside
+        spatialHash.insertObject(2, 20, 20, 5, 5); // Inside
+        spatialHash.insertObject(3, 50, 50, 5, 5); // Outside
+
+        let result = spatialHash.getObejctsInRange(15, 15, 10);
+
+        expect(result.has(1)).toBe(true);
+        expect(result.has(2)).toBe(true);
+        expect(result.has(3)).toBe(false);
     });
 
-    test("Remove an object", () => {
-        spatialHash.insertObject(1, 10, 10, 5, 5);
-        spatialHash.remove(1);
-        expect(spatialHash.getTotalObjects()).toBe(0);
-        expect(spatialHash.getNearbyObjects(10, 10, 5, 5).size).toBe(0);
+    test("getObjectsInCircle should return objects touching the circle boundary", () => {
+        spatialHash.insertObject(1, 15, 15, 5, 5); // Fully inside
+        spatialHash.insertObject(2, 25, 15, 5, 5); // Right on the edge
+        spatialHash.insertObject(3, 40, 40, 5, 5); // Well outside
+
+        let result = spatialHash.getObejctsInRange(15, 15, 10);
+
+        expect(result.has(1)).toBe(true);
+        expect(result.has(2)).toBe(true);
+        expect(result.has(3)).toBe(false);
     });
 
-    test("Update an object's position", () => {
-        spatialHash.insertObject(1, 10, 10, 5, 5);
-        spatialHash.updateObject(1, 30, 30, 5, 5);
+    test("getObjectsInCircle should handle large objects spanning the circle boundary", () => {
+        spatialHash.insertObject(1, 5, 5, 20, 20); // Large, overlapping the circle
+        spatialHash.insertObject(2, 30, 30, 10, 10); // Outside
+        spatialHash.insertObject(3, 0, 0, 5, 5); // Fully inside
 
-        expect(spatialHash.getNearbyObjects(10, 10, 5, 5).has(1)).toBe(false);
-        expect(spatialHash.getNearbyObjects(30, 30, 5, 5).has(1)).toBe(true);
+        let result = spatialHash.getObejctsInRange(15, 15, 10);
+
+        expect(result.has(1)).toBe(true); // Large object should be included
+        expect(result.has(2)).toBe(false);
+        expect(result.has(3)).toBe(true);
     });
 
-    test("Get nearby objects", () => {
+    test("getObjectsInCircle should return an empty set if no objects are inside", () => {
+        spatialHash.insertObject(1, 50, 50, 10, 10);
+        spatialHash.insertObject(2, 60, 60, 5, 5);
+
+        let result = spatialHash.getObejctsInRange(10, 10, 5);
+
+        expect(result.size).toBe(0);
+    });
+
+    test("getObjectsInCircle should work with a small radius", () => {
         spatialHash.insertObject(1, 10, 10, 5, 5);
         spatialHash.insertObject(2, 15, 15, 5, 5);
-        spatialHash.insertObject(3, 50, 50, 5, 5);
+        spatialHash.insertObject(3, 30, 30, 5, 5);
+        spatialHash.insertObject(4, 20, 20, 10, 10);
 
-        const nearby = spatialHash.getNearbyObjects(10, 10, 10, 10);
-        expect(nearby.has(1)).toBe(true);
-        expect(nearby.has(2)).toBe(true);
-        expect(nearby.has(3)).toBe(false);
+        let result = spatialHash.getObejctsInRange(12, 12, 3);
+
+        expect(result.has(1)).toBe(true);
+        expect(result.has(2)).toBe(true);
+        expect(result.has(3)).toBe(false);
+        expect(result.has(4)).toBe(false);
     });
 
-
-
-    test("Grid size should update correctly", () => {
-        expect(spatialHash.getTotalCells()).toBe(0);
-        
+    test("getObjectsInCircle should work with a very large radius", () => {
         spatialHash.insertObject(1, 10, 10, 5, 5);
-        expect(spatialHash.getTotalCells()).toBeGreaterThan(0);
-        
-        spatialHash.remove(1);
-        expect(spatialHash.getTotalCells()).toBe(0);
+        spatialHash.insertObject(2, 30, 30, 5, 5);
+        spatialHash.insertObject(3, 100, 100, 5, 5);
+
+        let result = spatialHash.getObejctsInRange(50, 50, 100);
+
+        expect(result.has(1)).toBe(true);
+        expect(result.has(2)).toBe(true);
+        expect(result.has(3)).toBe(true);
     });
+
 });

@@ -2,7 +2,7 @@
 import IGameMediator from "./igameMediator.ts";
 import { PathFollower } from "../geometry/pathFollower.ts";
 import GameState from "./GameState.ts";
-import SpatialHash from "../utils/SpatialHash.ts";
+import SpatialHash, { getMobsSortedByDistance } from "../utils/SpatialHash.ts";
 import TowerFactory from "./factories/towerFactory.ts";
 import Tower from "./gameElements/towers/tower.ts";
 import Projectile from "./gameElements/projectiles/projectile.ts";
@@ -79,12 +79,12 @@ export default class GameLogic implements IGameMediator {
 
     private handleTower(tower: Tower): void {
         if (tower.isRedy(this.gameTimer)) {
-            const hash = this.spatialHash.getObjectsInCircle(tower.xGetCenter() , tower.yGetCenter() , tower.range)
+            const hash = this.spatialHash.getObejctsInRange(tower.xGetCenter() , tower.yGetCenter() , tower.range)
 
-            const targets = getMobsSortedByDistance(this.gameState.getMobs,hash , tower.x, tower.y)
+            const targets = getMobsSortedByDistance(this.gameState.getMobs(),hash , tower.x, tower.y, tower.range)
 
-            const shoot = targets.size > 0;
-            console.log(targets.size , ": " , shoot)
+            const shoot = targets.length > 0;
+            console.log(targets.length , ": " , shoot)
             if (shoot) {
                 console.log("shooting: " , tower.id)
                 let p = tower.shoot(this.gameTimer, targets , this.gameState);
@@ -100,7 +100,7 @@ export default class GameLogic implements IGameMediator {
         }
     }
 
-    //7
+    
     private handleTowers():void{
         this.gameState.getTowers().forEach(t => this.handleTower(t))
     }
@@ -129,7 +129,7 @@ export default class GameLogic implements IGameMediator {
         this.handleMobs();
         this.handleTowers()
         this.mediator.notify("GameLogic" , "MovePhaseEnd")
-        if(this.gameTimer%300===0){
+        if(this.gameTimer%30===0){
             this.generateMob()
         }
         this.gameTimer++;

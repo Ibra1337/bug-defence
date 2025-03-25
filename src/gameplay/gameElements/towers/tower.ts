@@ -2,6 +2,7 @@ import Sprite from "../../../GUI/Sprite";
 import ProjectileFactory from "../../factories/projectileFactory";
 import GameState from "../../GameState";
 import SpatialHash from "../../SpatialHash";
+import Mob from "../mobs/Mob";
 import Projectile from "../projectiles/projectile";
 
 export default abstract  class Tower extends Sprite{
@@ -18,7 +19,8 @@ export default abstract  class Tower extends Sprite{
 
     
 
-    abstract  shoot(gameTimer :number , targets :Array<[number, number]> , gameState :GameState):Projectile|null
+    abstract  shoot(gameTimer :number , targets :{mob: Mob,distance: number;}[] ,
+         gameState :GameState):Projectile|null
     
     isRedy(currentTime :number): boolean{
         return  this.lastShootTimer +this.cooldown < currentTime

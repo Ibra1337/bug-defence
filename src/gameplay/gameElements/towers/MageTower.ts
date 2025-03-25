@@ -8,11 +8,11 @@ import Tower from "./tower";
 export default class MageTower extends Tower {
 
 
-    public shoot(gameTimer :number , targets :Array<[number, number]> , gameState :GameState ): Projectile|null {
+    public shoot(gameTimer :number , targets :{ mob: Mob; distance: number; }[] , gameState :GameState ): Projectile|null {
         if (!this.isRedy(gameTimer))
             return null;
 
-        const target = gameState.getMobs().get(targets[0][1])
+        const target = targets[0].mob;
         if (target)
             return this.projectileFactory.createMageProjectile(this.x , this.y , this.findTarget({x:target!.xGetCenter() , y:target!.yGetCenter()}));
 
