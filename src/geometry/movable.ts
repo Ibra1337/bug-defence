@@ -1,9 +1,8 @@
 import Sprite from "../GUI/Sprite";
 
-const enum xDirection {LEFT = -1 ,STAY =0 ,  RIGHT = 1}
-const enum yDirection {UP = -1 ,STAY=0 , DOWN =1}
-
 export abstract class Movable extends Sprite{
+
+    private angle =0;
 
     constructor(  x:number ,  y :number ,  width:number ,  height: number , image:string , public speed :number ){
         super(x,y,width,height,image )
@@ -27,7 +26,8 @@ export abstract class Movable extends Sprite{
         let centerX = this.x + this.width / 2;
         let centerY = this.y + this.height / 2;
     
-
+        const oldx = this.x;
+        const oldy = this.y
         let direction = {
             x: target.x - centerX,
             y: target.y - centerY,
@@ -43,12 +43,16 @@ export abstract class Movable extends Sprite{
             this.x += direction.x * this.speed;
             this.y += direction.y * this.speed;
         }
-    
+        
+        let rad = Math.atan2(this.y - oldy, this.x - oldy); 
+        this.angle = rad * (180 / Math.PI);
         return distance;
     }
 
     abstract move() :void
 
-}
 
-export {xDirection , yDirection}
+    public getAngle(){
+        return this.angle;
+    }
+}

@@ -153,9 +153,12 @@ export class Renderer {
     }
 
     drawMob(object: Sprite) {
-        this.getImage(object.color, (img) => {
+
+
+        this.getImage(object.image, (img) => {
             this.gameCtx.drawImage(img, object.x, object.y, object.width, object.height);
         });
+    
     }
 
     private drawMapSquare(x: number, y: number, w: number, h: number): void {
