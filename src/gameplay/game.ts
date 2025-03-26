@@ -6,6 +6,7 @@ import GameState from "./GameState.ts";
 import IGameMediator from "./igameMediator.ts";
 import Config from "../Config.ts";
 import { CellStatus } from "../types/CellStatus.ts";
+import Shop from "./Shop.ts";
 
 
 export default class Game implements IGameMediator{
@@ -16,20 +17,20 @@ export default class Game implements IGameMediator{
 
     
     private board :number[][];
-
-        private selectedTower  = "none";
+    private shop: Shop;
+    private selectedTower  = "none";
 
     private gameOver = false;    
 
     constructor(){
         this.board = Array.from({ length: Config.blockNumber  }, () => Array(Config.blockNumber).fill(CellStatus.Free));
-
         this.board[0][0] = CellStatus.Start;
         this.board[Config.blockNumber-2][Config.blockNumber-1] = CellStatus.End;
         console.log(this.board)
         this.gameState = new GameState();
         this.gameLogic = new GameLogic(this.gameState , this.board, this);
         this.renderer = new Renderer(this.gameState ,this.board , this );
+        this.shop = new Shop()
     }
     notify(sender: string, event: string, data?: any): void {
         
@@ -39,6 +40,9 @@ export default class Game implements IGameMediator{
             break;
         case "tower-place":
             console.log("tower placed at - from game" , data)
+
+            if (!this.shop.validateAndPurchase(this.gameState , this.selectedTower))
+                break
             const xs = Config.width / Config.blockNumber;
             const ys = Config.height / Config.blockNumber; 
             console.log("<>?<>: " ,this.selectedTower)

@@ -3,13 +3,13 @@ import GameState from "./GameState";
 
 export default class Shop {
 
-    private towerPrices = new Map<TowerType, number>([
+    private towerPrices = new Map<string, number>([
         [TowerType.Archer, 100],
         [TowerType.Mage ,150 ],
         [TowerType.Cannon , 200]
     ]);
 
-    public validatePurchase(gameState: GameState , towerType: TowerType): boolean{
+    public validateAndPurchase(gameState: GameState , towerType: string): boolean{
         let p = this.towerPrices.get(towerType);
         if(!p)
             return false;
